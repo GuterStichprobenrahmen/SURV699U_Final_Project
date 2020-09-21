@@ -1,0 +1,1360 @@
+---
+title: "CE Income Item Non-response or Invalid Response:  Towards a Predictive Model"
+author: "Mark Frame"
+date: "December 2, 2018"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+install.packages("knitr")
+knitr::opts_chunk$set(echo = TRUE)
+```
+s
+
+```{r}
+install.packages("tidyverse")
+install.packages("GGally")
+install.packages("mlbench")
+install.packages("boot")
+install.packages("glmnet")
+install.packages("caret")
+install.packages("gglasso")
+install.packages("RSocrata")
+install.packages("ggplot2")
+install.packages("ggmap")
+install.packages("e1071")
+install.packages("class")
+install.packages("PRROC")
+install.packages("pROC")
+install.packages("titanic")
+install.packages("rpart")
+```
+
+```{r}
+install.packages("party")
+install.packages("partykit")
+install.packages("verification")
+install.packages("strucchange")
+install.packages("foreach")
+install.packages("pdp")
+```
+
+```{r}
+install.packages("plotmo")
+install.packages("randomForest")
+install.packages("fastAdaboost")
+install.packages("gbm")
+install.packages("xgboost")
+install.packages("mboost")
+install.packages("ranger")
+install.packages("devtools")
+```
+
+```{r}
+devtools::install_github("AppliedDataSciencePartners/xgboostExplainer")
+```
+
+```{r}
+install.packages("spam")
+```
+
+```{r}
+install.packages("fields")
+```
+
+```{r}
+install.packages("verification")
+```
+
+```{r}
+install.packages("missForest")
+```
+
+```{r}
+install.packages("caret")
+```
+
+```{r}
+install.packages("caretEnsemble")
+install.packages("SuperLearner")
+install.packages("subsemble")
+install.packages("smotefamily")
+install.packages("DMwR")
+```
+
+```{r}
+install.packages("gbm")
+install.packages("e1071")
+```
+
+```{r}
+library(tidyverse)
+library(GGally)
+library(mlbench)
+library(boot)
+library(glmnet)
+library(caret)
+library(gglasso)
+library(RSocrata)
+library(ggplot2)
+library(ggmap)
+library(e1071)
+library(class)
+library(PRROC)
+library(pROC)
+library(titanic)
+library(rpart)
+library(party)
+library(partykit)
+
+library(strucchange)
+library(foreach)
+library(pdp)
+library(plotmo)
+library(randomForest)
+library(fastAdaboost)
+library(gbm)
+library(xgboost)
+library(mboost)
+library(ranger)
+library(devtools)
+```
+
+```{r}
+library(missForest)
+```
+
+```{r}
+library(verification)
+```
+
+```{r}
+library(caretEnsemble)
+library(SuperLearner)
+library(subsemble)
+library(smotefamily)
+library(DMwR)
+```
+
+```{r}
+library(xgboostExplainer)
+```
+
+```{r}
+search()
+```
+
+
+```{r}
+MEMD_1=read.csv("D:/memd141.csv", header = TRUE, sep=',')
+MEMD_2=read.csv("D:/memd142.csv", header = TRUE, sep=',')
+MEMD_3=read.csv("D:/memd143.csv", header = TRUE, sep=',')
+MEMD_4=read.csv("D:/memd144.csv", header = TRUE, sep=',')
+
+```
+
+```{r}
+MEMD_FMLD_141_1=read.csv("D:/memd_fmld141_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_142_1=read.csv("D:/memd_fmld142_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_143_1=read.csv("D:/memd_fmld143_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_144_1=read.csv("D:/memd_fmld144_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_151_1=read.csv("D:/memd_fmld151_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_152_1=read.csv("D:/memd_fmld152_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_153_1=read.csv("D:/memd_fmld153_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_154_1=read.csv("D:/memd_fmld154_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_161_1=read.csv("D:/memd_fmld161_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_162_1=read.csv("D:/memd_fmld162_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_163_1=read.csv("D:/memd_fmld163_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_164_1=read.csv("D:/memd_fmld164_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_171_1=read.csv("D:/memd_fmld171_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_172_1=read.csv("D:/memd_fmld172_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_173_1=read.csv("D:/memd_fmld173_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_174_1=read.csv("D:/memd_fmld174_1_1118",header=TRUE,sep=',')
+
+```
+
+```{r}
+MEMD_FMLD_141_1=read.csv("E:/memd_fmld141_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_142_1=read.csv("E:/memd_fmld142_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_143_1=read.csv("E:/memd_fmld143_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_144_1=read.csv("E:/memd_fmld144_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_151_1=read.csv("E:/memd_fmld151_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_152_1=read.csv("E:/memd_fmld152_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_153_1=read.csv("E:/memd_fmld153_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_154_1=read.csv("E:/memd_fmld154_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_161_1=read.csv("E:/memd_fmld161_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_162_1=read.csv("E:/memd_fmld162_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_163_1=read.csv("E:/memd_fmld163_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_164_1=read.csv("E:/memd_fmld164_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_171_1=read.csv("E:/memd_fmld171_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_172_1=read.csv("E:/memd_fmld172_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_173_1=read.csv("E:/memd_fmld173_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_174_1=read.csv("E:/memd_fmld174_1_1118",header=TRUE,sep=',')
+```
+
+
+```{r}
+MEMD_FMLD_141_1=read.csv("F:/memd_fmld141_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_142_1=read.csv("F:/memd_fmld142_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_143_1=read.csv("F:/memd_fmld143_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_144_1=read.csv("F:/memd_fmld144_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_151_1=read.csv("F:/memd_fmld151_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_152_1=read.csv("F:/memd_fmld152_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_153_1=read.csv("F:/memd_fmld153_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_154_1=read.csv("F:/memd_fmld154_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_161_1=read.csv("F:/memd_fmld161_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_162_1=read.csv("F:/memd_fmld162_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_163_1=read.csv("F:/memd_fmld163_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_164_1=read.csv("F:/memd_fmld164_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_171_1=read.csv("F:/memd_fmld171_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_172_1=read.csv("F:/memd_fmld172_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_173_1=read.csv("F:/memd_fmld173_1_1118",header=TRUE,sep=',')
+MEMD_FMLD_174_1=read.csv("F:/memd_fmld174_1_1118",header=TRUE,sep=',')
+```
+
+
+```{r}
+names(MEMD_FMLD_141_1)
+ncol(MEMD_FMLD_141_1)
+```
+
+```{r}
+MEMD_FMLD_141_1$ANFEDTXM <- NULL
+MEMD_FMLD_141_1$ANFEDTXX <- NULL
+MEMD_FMLD_141_1$ANFE_TXM <- NULL
+MEMD_FMLD_141_1$ANFE_TXX <- NULL
+MEMD_FMLD_141_1$ANSTATXM <- NULL
+MEMD_FMLD_141_1$ANSTATXX <- NULL
+MEMD_FMLD_141_1$ANST_TXM <- NULL
+MEMD_FMLD_141_1$ANST_TXX <- NULL
+MEMD_FMLD_141_1$FEDTXX  <- NULL
+MEMD_FMLD_141_1$FEDTXX_ <- NULL
+MEMD_FMLD_141_1$STATXX  <- NULL
+MEMD_FMLD_141_1$STATXX_ <- NULL
+
+names(MEMD_FMLD_141_1)
+ncol(MEMD_FMLD_141_1)
+```
+
+```{r}
+MEMD_FMLD_142_1$ANFEDTXM <- NULL
+MEMD_FMLD_142_1$ANFEDTXX <- NULL
+MEMD_FMLD_142_1$ANFE_TXM <- NULL
+MEMD_FMLD_142_1$ANFE_TXX <- NULL
+MEMD_FMLD_142_1$ANSTATXM <- NULL
+MEMD_FMLD_142_1$ANSTATXX <- NULL
+MEMD_FMLD_142_1$ANST_TXM <- NULL
+MEMD_FMLD_142_1$ANST_TXX <- NULL
+MEMD_FMLD_142_1$FEDTXX  <- NULL
+MEMD_FMLD_142_1$FEDTXX_ <- NULL
+MEMD_FMLD_142_1$STATXX  <- NULL
+MEMD_FMLD_142_1$STATXX_ <- NULL
+
+names(MEMD_FMLD_142_1)
+ncol(MEMD_FMLD_142_1)
+```
+
+```{r}
+MEMD_FMLD_143_1$ANFEDTXM <- NULL
+MEMD_FMLD_143_1$ANFEDTXX <- NULL
+MEMD_FMLD_143_1$ANFE_TXM <- NULL
+MEMD_FMLD_143_1$ANFE_TXX <- NULL
+MEMD_FMLD_143_1$ANSTATXM <- NULL
+MEMD_FMLD_143_1$ANSTATXX <- NULL
+MEMD_FMLD_143_1$ANST_TXM <- NULL
+MEMD_FMLD_143_1$ANST_TXX <- NULL
+MEMD_FMLD_143_1$FEDTXX  <- NULL
+MEMD_FMLD_143_1$FEDTXX_ <- NULL
+MEMD_FMLD_143_1$STATXX  <- NULL
+MEMD_FMLD_143_1$STATXX_ <- NULL
+
+names(MEMD_FMLD_143_1)
+ncol(MEMD_FMLD_143_1)
+```
+
+```{r}
+MEMD_FMLD_144_1$ANFEDTXM <- NULL
+MEMD_FMLD_144_1$ANFEDTXX <- NULL
+MEMD_FMLD_144_1$ANFE_TXM <- NULL
+MEMD_FMLD_144_1$ANFE_TXX <- NULL
+MEMD_FMLD_144_1$ANSTATXM <- NULL
+MEMD_FMLD_144_1$ANSTATXX <- NULL
+MEMD_FMLD_144_1$ANST_TXM <- NULL
+MEMD_FMLD_144_1$ANST_TXX <- NULL
+MEMD_FMLD_144_1$FEDTXX  <- NULL
+MEMD_FMLD_144_1$FEDTXX_ <- NULL
+MEMD_FMLD_144_1$STATXX  <- NULL
+MEMD_FMLD_144_1$STATXX_ <- NULL
+
+names(MEMD_FMLD_144_1)
+ncol(MEMD_FMLD_144_1)
+```
+
+```{r}
+MEMD_FMLD_141_2=read.csv("D:/memd_fmld141_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_142_2=read.csv("D:/memd_fmld142_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_143_2=read.csv("D:/memd_fmld143_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_144_2=read.csv("D:/memd_fmld144_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_151_2=read.csv("D:/memd_fmld151_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_152_2=read.csv("D:/memd_fmld152_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_153_2=read.csv("D:/memd_fmld153_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_154_2=read.csv("D:/memd_fmld154_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_161_2=read.csv("D:/memd_fmld161_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_162_2=read.csv("D:/memd_fmld162_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_163_2=read.csv("D:/memd_fmld163_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_164_2=read.csv("D:/memd_fmld164_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_171_2=read.csv("D:/memd_fmld171_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_172_2=read.csv("D:/memd_fmld172_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_173_2=read.csv("D:/memd_fmld173_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_174_2=read.csv("D:/memd_fmld174_2_1118",header=TRUE,sep=',')
+```
+
+```{r}
+MEMD_FMLD_141_2=read.csv("E:/memd_fmld141_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_142_2=read.csv("E:/memd_fmld142_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_143_2=read.csv("E:/memd_fmld143_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_144_2=read.csv("E:/memd_fmld144_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_151_2=read.csv("E:/memd_fmld151_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_152_2=read.csv("E:/memd_fmld152_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_153_2=read.csv("E:/memd_fmld153_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_154_2=read.csv("E:/memd_fmld154_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_161_2=read.csv("E:/memd_fmld161_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_162_2=read.csv("E:/memd_fmld162_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_163_2=read.csv("E:/memd_fmld163_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_164_2=read.csv("E:/memd_fmld164_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_171_2=read.csv("E:/memd_fmld171_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_172_2=read.csv("E:/memd_fmld172_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_173_2=read.csv("E:/memd_fmld173_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_174_2=read.csv("E:/memd_fmld174_2_1118",header=TRUE,sep=',')
+```
+
+
+```{r}
+MEMD_FMLD_141_2=read.csv("F:/memd_fmld141_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_142_2=read.csv("F:/memd_fmld142_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_143_2=read.csv("F:/memd_fmld143_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_144_2=read.csv("F:/memd_fmld144_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_151_2=read.csv("F:/memd_fmld151_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_152_2=read.csv("F:/memd_fmld152_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_153_2=read.csv("F:/memd_fmld153_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_154_2=read.csv("F:/memd_fmld154_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_161_2=read.csv("F:/memd_fmld161_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_162_2=read.csv("F:/memd_fmld162_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_163_2=read.csv("F:/memd_fmld163_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_164_2=read.csv("F:/memd_fmld164_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_171_2=read.csv("F:/memd_fmld171_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_172_2=read.csv("F:/memd_fmld172_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_173_2=read.csv("F:/memd_fmld173_2_1118",header=TRUE,sep=',')
+MEMD_FMLD_174_2=read.csv("F:/memd_fmld174_2_1118",header=TRUE,sep=',')
+```
+
+
+```{r}
+ncol(MEMD_FMLD_141_2)
+ncol(MEMD_FMLD_142_2)
+ncol(MEMD_FMLD_143_2)
+ncol(MEMD_FMLD_144_2)
+ncol(MEMD_FMLD_151_2)
+ncol(MEMD_FMLD_152_2)
+ncol(MEMD_FMLD_153_2)
+ncol(MEMD_FMLD_154_2)
+ncol(MEMD_FMLD_161_2)
+ncol(MEMD_FMLD_162_2)
+ncol(MEMD_FMLD_163_2)
+ncol(MEMD_FMLD_164_2)
+ncol(MEMD_FMLD_171_2)
+ncol(MEMD_FMLD_172_2)
+ncol(MEMD_FMLD_173_2)
+ncol(MEMD_FMLD_174_2)
+```
+
+```{r}
+MEMD_FMLD_141_2$ANFEDTXM <- NULL
+MEMD_FMLD_141_2$ANFEDTXX <- NULL
+MEMD_FMLD_141_2$ANFE_TXM <- NULL
+MEMD_FMLD_141_2$ANFE_TXX <- NULL
+MEMD_FMLD_141_2$ANSTATXM <- NULL
+MEMD_FMLD_141_2$ANSTATXX <- NULL
+MEMD_FMLD_141_2$ANST_TXM <- NULL
+MEMD_FMLD_141_2$ANST_TXX <- NULL
+MEMD_FMLD_141_2$FEDTXX <- NULL
+MEMD_FMLD_141_2$FEDTXX_ <- NULL
+MEMD_FMLD_141_2$STATXX <- NULL
+MEMD_FMLD_141_2$STATXX_ <- NULL
+
+names(MEMD_FMLD_141_2)
+ncol(MEMD_FMLD_141_2)
+
+```
+
+```{r}
+MEMD_FMLD_142_2$ANFEDTXM <- NULL
+MEMD_FMLD_142_2$ANFEDTXX <- NULL
+MEMD_FMLD_142_2$ANFE_TXM <- NULL
+MEMD_FMLD_142_2$ANFE_TXX <- NULL
+MEMD_FMLD_142_2$ANSTATXM <- NULL
+MEMD_FMLD_142_2$ANSTATXX <- NULL
+MEMD_FMLD_142_2$ANST_TXM <- NULL
+MEMD_FMLD_142_2$ANST_TXX <- NULL
+MEMD_FMLD_142_2$FEDTXX <- NULL
+MEMD_FMLD_142_2$FEDTXX_ <- NULL
+MEMD_FMLD_142_2$STATXX <- NULL
+MEMD_FMLD_142_2$STATXX_ <- NULL
+
+names(MEMD_FMLD_142_2)
+ncol(MEMD_FMLD_142_2)
+```
+
+```{r}
+MEMD_FMLD_143_2$ANFEDTXM <- NULL
+MEMD_FMLD_143_2$ANFEDTXX <- NULL
+MEMD_FMLD_143_2$ANFE_TXM <- NULL
+MEMD_FMLD_143_2$ANFE_TXX <- NULL
+MEMD_FMLD_143_2$ANSTATXM <- NULL
+MEMD_FMLD_143_2$ANSTATXX <- NULL
+MEMD_FMLD_143_2$ANST_TXM <- NULL
+MEMD_FMLD_143_2$ANST_TXX <- NULL
+MEMD_FMLD_143_2$FEDTXX <- NULL
+MEMD_FMLD_143_2$FEDTXX_ <- NULL
+MEMD_FMLD_143_2$STATXX <- NULL
+MEMD_FMLD_143_2$STATXX_ <- NULL
+
+names(MEMD_FMLD_143_2)
+ncol(MEMD_FMLD_143_2)
+```
+
+
+```{r}
+MEMD_FMLD_144_2$ANFEDTXM <- NULL
+MEMD_FMLD_144_2$ANFEDTXX <- NULL
+MEMD_FMLD_144_2$ANFE_TXM <- NULL
+MEMD_FMLD_144_2$ANFE_TXX <- NULL
+MEMD_FMLD_144_2$ANSTATXM <- NULL
+MEMD_FMLD_144_2$ANSTATXX <- NULL
+MEMD_FMLD_144_2$ANST_TXM <- NULL
+MEMD_FMLD_144_2$ANST_TXX <- NULL
+MEMD_FMLD_144_2$FEDTXX <- NULL
+MEMD_FMLD_144_2$FEDTXX_ <- NULL
+MEMD_FMLD_144_2$STATXX <- NULL
+MEMD_FMLD_144_2$STATXX_ <- NULL
+
+names(MEMD_FMLD_144_2)
+ncol(MEMD_FMLD_144_2)
+```
+
+
+```{r}
+MEMD_FMLD_2_train <- rbind.data.frame(MEMD_FMLD_141_2,MEMD_FMLD_142_2,MEMD_FMLD_143_2,MEMD_FMLD_144_2,
+      MEMD_FMLD_151_2,MEMD_FMLD_152_2,MEMD_FMLD_153_2,MEMD_FMLD_154_2,
+      MEMD_FMLD_161_2,MEMD_FMLD_162_2,MEMD_FMLD_163_2,MEMD_FMLD_164_2
+      )
+```
+
+
+```{r}
+MEMD_FMLD_2_train <- rbind.data.frame(
+      MEMD_FMLD_151_2,MEMD_FMLD_152_2,MEMD_FMLD_153_2,MEMD_FMLD_154_2,
+      MEMD_FMLD_161_2,MEMD_FMLD_162_2,MEMD_FMLD_163_2,MEMD_FMLD_164_2
+      )
+```
+
+```{r}
+MEMD_FMLD_2_train <- rbind.data.frame(MEMD_FMLD_161_2,MEMD_FMLD_162_2,MEMD_FMLD_163_2,MEMD_FMLD_164_2)
+```
+
+```{r}
+MEMD_FMLD_2_train$WAGEX_2 = "Y"
+MEMD_FMLD_2_train$WAGEX_2[MEMD_FMLD_2_train$WAGEX_ == "C"] = "N"
+MEMD_FMLD_2_train$WAGEX_2 = as.factor(MEMD_FMLD_2_train$WAGEX_2)
+MEMD_FMLD_2_train$WAGEX_2 = relevel(MEMD_FMLD_2_train$WAGEX_2,"N")
+table(MEMD_FMLD_2_train$WAGEX_,MEMD_FMLD_2_train$WAGEX_2)
+summary(MEMD_FMLD_2_train$WAGEX_2)
+```
+
+```{r}
+MEMD_FMLD_2_train$WAGEX_3 = "Y"
+MEMD_FMLD_2_train$WAGEX_3[MEMD_FMLD_2_train$WAGEX_ == "C"] = "N"
+MEMD_FMLD_2_train$WAGEX_3[MEMD_FMLD_2_train$WAGEX_ == "B"] = "N"
+MEMD_FMLD_2_train$WAGEX_3 = as.factor(MEMD_FMLD_2_train$WAGEX_3)
+MEMD_FMLD_2_train$WAGEX_3 = relevel(MEMD_FMLD_2_train$WAGEX_3,"N")
+table(MEMD_FMLD_2_train$WAGEX_,MEMD_FMLD_2_train$WAGEX_3)
+summary(MEMD_FMLD_2_train$WAGEX_3)
+```
+
+```{r}
+MEMD_FMLD_2_test <- rbind.data.frame(MEMD_FMLD_171_2,MEMD_FMLD_172_2,MEMD_FMLD_173_2,MEMD_FMLD_174_2)
+```
+
+```{r}
+MEMD_FMLD_2_test$WAGEX_2 = "Y"
+MEMD_FMLD_2_test$WAGEX_2[MEMD_FMLD_2_test$WAGEX_ == "C"] = "N"
+MEMD_FMLD_2_test$WAGEX_2 = as.factor(MEMD_FMLD_2_test$WAGEX_2)
+MEMD_FMLD_2_test$WAGEX_2 = relevel(MEMD_FMLD_2_test$WAGEX_2,"N")
+table(MEMD_FMLD_2_test$WAGEX_,MEMD_FMLD_2_test$WAGEX_2)
+summary(MEMD_FMLD_2_test$WAGEX_2)
+```
+
+```{r}
+MEMD_FMLD_2_test$WAGEX_3 = "Y"
+MEMD_FMLD_2_test$WAGEX_3[MEMD_FMLD_2_test$WAGEX_ == "C"] = "N"
+MEMD_FMLD_2_test$WAGEX_3[MEMD_FMLD_2_test$WAGEX_ == "B"] = "N"
+MEMD_FMLD_2_test$WAGEX_3 = as.factor(MEMD_FMLD_2_test$WAGEX_3)
+MEMD_FMLD_2_test$WAGEX_3 = relevel(MEMD_FMLD_2_test$WAGEX_3,"N")
+table(MEMD_FMLD_2_test$WAGEX_,MEMD_FMLD_2_test$WAGEX_3)
+summary(MEMD_FMLD_2_test$WAGEX_3)
+```
+
+```{r}
+WAGEX_tree1 <- rpart(WAGEX_ ~ CUTENURE + DESCRIP + VEHQ + TYPOWND + EARNCOMP + ARM_FORC + MARITAL + AGE + WKSTATUS, data = MEMD_FMLD_2_train, method = "class")
+WAGEX_tree1
+
+```
+
+
+```{r}
+WAGEX_2tree1 <- rpart(WAGEX_2 ~ CUTENURE + DESCRIP + VEHQ + TYPOWND + EARNCOMP + ARM_FORC + MARITAL + AGE + WKSTATUS + EMPLTYPE + CU_CODE1 + EDUCA + MEMBRACE + OCCULIST + HRSPERWK + GROSPAYX + OCCUEARN + HORIGIN + WAGEB + IN_COLL + MEDICARE, data = MEMD_FMLD_2_train, method = "class")
+WAGEX_2tree1
+```
+
+```{r}
+WAGEX_3tree1 <- rpart(WAGEX_3 ~ CUTENURE + DESCRIP + VEHQ + TYPOWND + EARNCOMP + ARM_FORC + MARITAL + AGE + WKSTATUS + EMPLTYPE + CU_CODE1 + EDUCA + MEMBRACE + OCCULIST + HRSPERWK + GROSPAYX + OCCUEARN + HORIGIN + WAGEB + IN_COLL + MEDICARE, data = MEMD_FMLD_2_train, method = "class")
+WAGEX_3tree1
+```
+
+
+```{r}
+party_WAGEX_tree1 <- as.party(WAGEX_tree1)
+plot(party_WAGEX_tree1, gp = gpar(fontsize = 9))
+```
+
+
+```{r}
+party_WAGEX_2tree1 <- as.party(WAGEX_2tree1)
+plot(party_WAGEX_2tree1, gp = gpar(fontsize = 9))
+```
+
+```{r}
+party_WAGEX_3tree1 <- as.party(WAGEX_3tree1)
+plot(party_WAGEX_3tree1, gp = gpar(fontsize = 9))
+```
+
+
+##Add in these variables to the first tree and you end up with 
+##just one node, rather as we see for the second tree:
+##
+##EMPLTYPE + CU_CODE1 + EDUCA + MEMBRACE + OCCULIST + HRSPERWK
+
+
+```{r}
+WAGEX_2tree2 <- rpart(WAGEX_2 ~ CUTENURE + VEHQ + TYPOWND + EARNCOMP + ARM_FORC + MARITAL + AGE + WKSTATUS + EMPLTYPE + CU_CODE1 + EDUCA + MEMBRACE + OCCULIST + HRSPERWK + HORIGIN + GROSPAYX + MEDICARE + OCCUEARN + WAGEB + IN_COLL + DESCRIP, data = MEMD_FMLD_2_train, 
+                     control = rpart.control(minsplit = 10,                                            minbucket = 3, 
+                     cp = 0.001, # min improvement through splitting
+                     maxdepth = 30,
+                     method = "class"))
+```
+
+```{r}
+WAGEX_3tree2 <- rpart(WAGEX_3 ~ CUTENURE + VEHQ + TYPOWND + EARNCOMP + ARM_FORC + MARITAL + AGE + WKSTATUS + EMPLTYPE + CU_CODE1 + EDUCA + MEMBRACE + OCCULIST + HRSPERWK + HORIGIN + GROSPAYX + MEDICARE + OCCUEARN + WAGEB + IN_COLL + DESCRIP, data = MEMD_FMLD_2_train, 
+                     control = rpart.control(minsplit = 10,                                            minbucket = 3, 
+                     cp = 0.001, # min improvement through splitting
+                     maxdepth = 30,
+                     method = "class"))
+```
+
+```{r}
+party_WAGEX_2tree2 <- as.party(WAGEX_2tree2)
+plot(party_WAGEX_2tree2, gp = gpar(fontsize = 6))
+```
+
+```{r}
+party_WAGEX_3tree2 <- as.party(WAGEX_3tree2)
+plot(party_WAGEX_3tree2, gp = gpar(fontsize = 6))
+```
+
+```{r}
+printcp(WAGEX_2tree2)
+plotcp(WAGEX_2tree2)
+```
+
+```{r}
+minx2 <- which.min(WAGEX_2tree2$cptable[,"xerror"])
+mincp2a <- WAGEX_2tree2$cptable[minx2,"CP"]
+mincp2a
+```
+
+```{r}
+minx2 <- which.min(WAGEX_2tree2$cptable[,"xerror"])
+minxse2 <- WAGEX_2tree2$cptable[minx2,"xerror"] + WAGEX_2tree2$cptable[minx2,"xstd"]
+minse2 <- which(WAGEX_2tree2$cptable[1:minx2,"xerror"] < minxse2)
+mincp2b <- WAGEX_2tree2$cptable[minse2[1],"CP"]
+mincp2b
+```
+
+```{r}
+pruned_WAGEX_2tree2_scv <- prune(WAGEX_2tree2, cp = mincp2a)
+pruned_WAGEX_2tree2_scv
+```
+
+```{r}
+pruned_WAGEX_2tree2_1SE <- prune(WAGEX_2tree2, cp = mincp2b)
+pruned_WAGEX_2tree2_1SE
+```
+##The 2 WAGEX_2 trees once showed indistinguishable...
+##Move on now to the WAGEX_3 outcome variable analysis
+##Plotting the smaller tree in the WAGEX_2 Response...As seen here it is not so helpful...Same for CART generally
+
+```{r}
+party_pruned_WAGEX_2tree2_1SE <- as.party(pruned_WAGEX_2tree2_1SE)
+plot(party_pruned_WAGEX_2tree2_1SE, gp = gpar(fontsize = 7))
+```
+
+
+```{r}
+printcp(WAGEX_3tree2)
+plotcp(WAGEX_3tree2)
+```
+
+```{r}
+minx3 <- which.min(WAGEX_3tree2$cptable[,"xerror"])
+mincp3a <- WAGEX_3tree2$cptable[minx3,"CP"]
+mincp3a
+```
+
+```{r}
+minx3 <- which.min(WAGEX_3tree2$cptable[,"xerror"])
+minxse3 <- WAGEX_3tree2$cptable[minx3,"xerror"] + WAGEX_3tree2$cptable[minx3,"xstd"]
+minse3 <- which(WAGEX_3tree2$cptable[1:minx3,"xerror"] < minxse3)
+mincp3b <- WAGEX_3tree2$cptable[minse3[1],"CP"]
+mincp3b
+```
+
+```{r}
+pruned_WAGEX_3tree2_scv <- prune(WAGEX_3tree2, cp = mincp3a)
+pruned_WAGEX_3tree2_scv
+```
+
+```{r}
+pruned_WAGEX_3tree2_1SE <- prune(WAGEX_3tree2, cp = mincp3b)
+pruned_WAGEX_3tree2_1SE
+```
+
+##plotting the smaller tree for the WAGEX_3 Response
+```{r}
+party_pruned_WAGEX_3tree2_1SE <- as.party(pruned_WAGEX_3tree2_1SE)
+plot(party_pruned_WAGEX_3tree2_1SE, gp = gpar(fontsize = 7))
+
+```
+
+```{r}
+y_tree_scv <- predict(pruned_WAGEX_3tree2_scv, newdata = MEMD_FMLD_2_test, type = "class")
+y_tree_1SE <- predict(pruned_WAGEX_3tree2_1SE, newdata = MEMD_FMLD_2_test, type = "class")
+```
+
+
+```{r}
+confusionMatrix(y_tree_scv, MEMD_FMLD_2_test$WAGEX_3, mode = "everything", positive = "N")
+confusionMatrix(y_tree_1SE, MEMD_FMLD_2_test$WAGEX_3, mode = "everything", positive = "N")
+```
+
+###Let's do an RF on this stuff
+###We burn so much computing power, we need to makes things small
+
+```{r}
+MEMD_FMLD_2_train <- rbind.data.frame(MEMD_FMLD_161_2,MEMD_FMLD_162_2,MEMD_FMLD_163_2,MEMD_FMLD_164_2)
+
+MEMD_FMLD_2_train$WAGEX_2 = "Y"
+MEMD_FMLD_2_train$WAGEX_2[MEMD_FMLD_2_train$WAGEX_ == "C"] = "N"
+MEMD_FMLD_2_train$WAGEX_2 = as.factor(MEMD_FMLD_2_train$WAGEX_2)
+MEMD_FMLD_2_train$WAGEX_2 = relevel(MEMD_FMLD_2_train$WAGEX_2,"N")
+table(MEMD_FMLD_2_train$WAGEX_2,MEMD_FMLD_2_train$WAGEX_2)
+summary(MEMD_FMLD_2_train$WAGEX_2)
+
+MEMD_FMLD_2_train$WAGEX_3 = "Y"
+MEMD_FMLD_2_train$WAGEX_3[MEMD_FMLD_2_train$WAGEX_ == "C"] = "N"
+MEMD_FMLD_2_train$WAGEX_3[MEMD_FMLD_2_train$WAGEX_ == "B"] = "N"
+MEMD_FMLD_2_train$WAGEX_3 = as.factor(MEMD_FMLD_2_train$WAGEX_3)
+MEMD_FMLD_2_train$WAGEX_3 = relevel(MEMD_FMLD_2_train$WAGEX_3,"N")
+table(MEMD_FMLD_2_train$WAGEX_,MEMD_FMLD_2_train$WAGEX_3)
+summary(MEMD_FMLD_2_train$WAGEX_3)
+
+MEMD_FMLD_2_train$WAGEX_1 = "D"
+MEMD_FMLD_2_train$WAGEX_1[MEMD_FMLD_2_train$WAGEX_ == "B"] = "B"
+MEMD_FMLD_2_train$WAGEX_1[MEMD_FMLD_2_train$WAGEX_ == "C"] = "C"
+MEMD_FMLD_2_train$WAGEX_1 = as.factor(MEMD_FMLD_2_train$WAGEX_1)
+table(MEMD_FMLD_2_train$WAGEX_,MEMD_FMLD_2_train$WAGEX_1)
+summary(MEMD_FMLD_2_train$WAGEX_1)
+
+MEMD_FMLD_2_test$WAGEX_1 = "D"
+MEMD_FMLD_2_test$WAGEX_1[MEMD_FMLD_2_test$WAGEX_ == "B"] = "B"
+MEMD_FMLD_2_test$WAGEX_1[MEMD_FMLD_2_test$WAGEX_ == "C"] = "C"
+MEMD_FMLD_2_test$WAGEX_1 = as.factor(MEMD_FMLD_2_test$WAGEX_1)
+table(MEMD_FMLD_2_test$WAGEX_,MEMD_FMLD_2_test$WAGEX_1)
+summary(MEMD_FMLD_2_test$WAGEX_1)
+
+
+```
+
+```{r}
+X1 = subset(MEMD_FMLD_2_train, select = c(WAGEX_,
+                                          WAGEX_1,
+                                           WAGEX_2,
+                                           WAGEX_3,
+                                           ARM_FORC,
+                                           TYPOWND,
+                                           IN_COLL,
+                                           DESCRIP,
+                                           WAGEB,
+                                           GROSPAYX,
+                                           MEDICARE,
+                                           VEHQ,
+                                           CU_CODE1,
+                                           CUTENURE,
+                                           HRSPERWK,
+                                           AGE,
+                                           OCCUEARN,
+                                           EDUCA,
+                                           HORIGIN,
+                                           EARNCOMP,
+                                           MEMBRACE,
+                                           EMPLTYPE,
+                                           WKSTATUS,
+                                           OCCULIST,
+                                           MARITAL
+                                           ))
+
+```
+
+```{r}
+X1$GROSPAYX <- as.numeric(X1$GROSPAYX)
+X1$AGE <- as.numeric(X1$AGE)
+X1$HRSPERWK <- as.numeric(X1$HRSPERWK)
+X1$OCCUEARN <- as.factor(X1$OCCUEARN)
+X1$ARM_FORC <- as.factor(X1$ARM_FORC)
+X1$TYPOWND <- as.factor(X1$TYPOWND)
+X1$IN_COLL <- as.factor(X1$IN_COLL)
+X1$DESCRIP <- as.factor(X1$DESCRIP)
+X1$WAGEB <- as.factor(X1$WAGEB)
+X1$MEDICARE <- as.factor(X1$MEDICARE)
+X1$VEHQ <- as.factor(X1$VEHQ)
+X1$CU_CODE1 <- as.factor(X1$CU_CODE1)
+X1$CUTENURE <- as.factor(X1$CUTENURE)
+X1$EDUCA <- as.factor(X1$EDUCA)
+X1$HORIGIN <- as.factor(X1$HORIGIN)
+X1$EARNCOMP <- as.factor(X1$EARNCOMP)
+X1$MEMBRACE <- as.factor(X1$MEMBRACE)
+X1$EMPLTYPE <- as.factor(X1$EMPLTYPE)
+X1$WKSTATUS <- as.factor(X1$WKSTATUS)
+X1$OCCULIST <- as.factor(X1$OCCULIST)
+X1$MARITAL <- as.factor(X1$MARITAL)
+```
+
+```{r}
+levels(X1$OCCUEARN)
+table(is.na(X1$OCCUEARN))
+```
+
+```{r}
+levels(X1$EARNCOMP) <- c(levels(X1$EARNCOMP), "8")
+levels(X1$DESCRIP) <- c(levels(X1$DESCRIP), "4","8")
+levels(X1$VEHQ) <- c(levels(X1$VEHQ), "13")
+```
+
+```{r}
+table(is.na(X1$GROSPAYX))
+table(is.na(X1$AGE))
+table(is.na(X1$HRSPERWK))
+table(is.na(X1$OCCUEARN))
+table(is.na(X1$ARM_FORC))
+table(is.na(X1$CUTENURE))
+table(is.na(X1$EDUCA))
+table(is.na(X1$HORIGIN))
+table(is.na(X1$OCCULIST))
+table(is.na(X1$MARITAL))
+table(is.na(X1$WKSTATUS))
+table(is.na(X1$TYPOWND))
+table(is.na(X1$IN_COLL))
+table(is.na(X1$DESCRIP))
+table(is.na(X1$WAGEB))
+table(is.na(X1$MEDICARE))
+table(is.na(X1$VEHQ))
+table(is.na(X1$CU_CODE1))
+table(is.na(X1$EARNCOMP))
+table(is.na(X1$MEMBRACE))
+table(is.na(X1$EMPLTYPE))
+```
+
+```{r}
+X1$ARM_FORC<-addNA(X1$ARM_FORC, ifany = FALSE)
+X1$TYPOWND<-addNA(X1$TYPOWND, ifany = FALSE)
+X1$IN_COLL<-addNA(X1$IN_COLL, ifany = FALSE)
+X1$DESCRIP<-addNA(X1$DESCRIP, ifany = FALSE)
+X1$WAGEB<-addNA(X1$WAGEB, ifany = FALSE)
+X1$MEDICARE<-addNA(X1$MEDICARE, ifany = FALSE)
+X1$VEHQ<-addNA(X1$VEHQ, ifany = FALSE)
+```
+
+```{r}
+summary(X1$ARM_FORC)
+summary(X1$EARNCOMP)
+summary(X1$TYPOWND)
+summary(X1$IN_COLL)
+summary(X1$DESCRIP)
+summary(X1$WAGEB)
+summary(X1$VEHQ)
+summary(X1$CU_CODE1)
+summary(X1$CUTENURE)
+summary(X1$EDUCA)
+summary(X1$HORIGIN)
+summary(X1$EARNCOMP)
+summary(X1$MEMBRACE)
+summary(X1$EMPLTYPE)
+summary(X1$WKSTATUS)
+summary(X1$OCCULIST)
+summary(X1$MARITAL)
+
+```
+
+```{r}
+summary(X2$ARM_FORC)
+summary(X2$EARNCOMP)
+summary(X2$TYPOWND)
+summary(X2$IN_COLL)
+summary(X2$DESCRIP)
+summary(X2$WAGEB)
+summary(X2$VEHQ)
+summary(X2$CU_CODE1)
+summary(X2$CUTENURE)
+summary(X2$EDUCA)
+summary(X2$HORIGIN)
+summary(X2$EARNCOMP)
+summary(X2$MEMBRACE)
+summary(X2$EMPLTYPE)
+summary(X2$WKSTATUS)
+summary(X2$OCCULIST)
+summary(X2$MARITAL)
+```
+
+
+
+
+
+
+```{r}
+X1$GROSPAYXFLAG<-"0"
+X1$GROSPAYXFLAG[is.na(X1$GROSPAYX) == "TRUE"] <- "1"
+X1$GROSPAYXFLAG<-as.factor(X1$GROSPAYXFLAG)
+summary(X1$GROSPAYXFLAG)
+```
+
+```{r}
+rough_X1 <- na.roughfix(X1)
+```
+
+```{r}
+X2 = subset(MEMD_FMLD_2_test, select = c(WAGEX_,
+                                         WAGEX_1,
+                                           WAGEX_2,
+                                           WAGEX_3,
+                                           ARM_FORC,
+                                           TYPOWND,
+                                           IN_COLL,
+                                           DESCRIP,
+                                           WAGEB,
+                                           GROSPAYX,
+                                           MEDICARE,
+                                           VEHQ,
+                                           CU_CODE1,
+                                           CUTENURE,
+                                           HRSPERWK,
+                                           AGE,
+                                           OCCUEARN,
+                                           EDUCA,
+                                           HORIGIN,
+                                           EARNCOMP,
+                                           MEMBRACE,
+                                           EMPLTYPE,
+                                           WKSTATUS,
+                                           OCCULIST,
+                                           MARITAL
+                                           ))
+
+```
+
+```{r}
+X2$GROSPAYX <- as.numeric(X2$GROSPAYX)
+X2$AGE <- as.numeric(X2$AGE)
+X2$HRSPERWK <- as.numeric(X2$HRSPERWK)
+X2$OCCUEARN <- as.factor(X2$OCCUEARN)
+X2$ARM_FORC <- as.factor(X2$ARM_FORC)
+X2$TYPOWND <- as.factor(X2$TYPOWND)
+X2$IN_COLL <- as.factor(X2$IN_COLL)
+X2$DESCRIP <- as.factor(X2$DESCRIP)
+X2$WAGEB <- as.factor(X2$WAGEB)
+X2$MEDICARE <- as.factor(X2$MEDICARE)
+X2$VEHQ <- as.factor(X2$VEHQ)
+X2$CU_CODE1 <- as.factor(X2$CU_CODE1)
+X2$CUTENURE <- as.factor(X2$CUTENURE)
+X2$EDUCA <- as.factor(X2$EDUCA)
+X2$HORIGIN <- as.factor(X2$HORIGIN)
+X2$EARNCOMP <- as.factor(X2$EARNCOMP)
+X2$MEMBRACE <- as.factor(X2$MEMBRACE)
+X2$EMPLTYPE <- as.factor(X2$EMPLTYPE)
+X2$WKSTATUS <- as.factor(X2$WKSTATUS)
+X2$OCCULIST <- as.factor(X2$OCCULIST)
+X2$MARITAL <- as.factor(X2$MARITAL)
+
+```
+
+```{r}
+levels(X2$VEHQ) <- c(levels(X2$VEHQ),"10","16","18")
+```
+
+```{r}
+levels(X2$OCCUEARN)
+table(is.na(X2$OCCUEARN))
+```
+
+
+```{r}
+table(is.na(MEMD_FMLD_2_train$GROSPAYX))
+table(is.na(MEMD_FMLD_2_train$AGE))
+table(is.na(MEMD_FMLD_2_train$HRSPERWK))
+table(is.na(MEMD_FMLD_2_train$OCCUEARN))
+table(is.na(MEMD_FMLD_2_train$ARM_FORC))
+table(is.na(MEMD_FMLD_2_train$CUTENURE))
+table(is.na(MEMD_FMLD_2_train$EDUCA))
+table(is.na(MEMD_FMLD_2_train$HORIGIN))
+table(is.na(MEMD_FMLD_2_train$OCCULIST))
+table(is.na(MEMD_FMLD_2_train$MARITAL))
+table(is.na(MEMD_FMLD_2_train$WKSTATUS))
+table(is.na(MEMD_FMLD_2_train$TYPOWND))
+table(is.na(MEMD_FMLD_2_train$IN_COLL))
+table(is.na(MEMD_FMLD_2_train$DESCRIP))
+table(is.na(MEMD_FMLD_2_train$WAGEB))
+table(is.na(MEMD_FMLD_2_train$MEDICARE))
+table(is.na(MEMD_FMLD_2_train$VEHQ))
+table(is.na(MEMD_FMLD_2_train$CU_CODE1))
+table(is.na(MEMD_FMLD_2_train$EARNCOMP))
+table(is.na(MEMD_FMLD_2_train$MEMBRACE))
+table(is.na(MEMD_FMLD_2_train$EMPLTYPE))
+
+```
+
+```{r}
+X2$ARM_FORC<-addNA(X2$ARM_FORC, ifany = FALSE)
+X2$TYPOWND<-addNA(X2$TYPOWND, ifany = FALSE)
+X2$IN_COLL<-addNA(X2$IN_COLL, ifany = FALSE)
+X2$DESCRIP<-addNA(X2$DESCRIP, ifany = FALSE)
+X2$WAGEB<-addNA(X2$WAGEB, ifany = FALSE)
+X2$MEDICARE<-addNA(X2$MEDICARE, ifany = FALSE)
+X2$VEHQ<-addNA(X2$VEHQ, ifany = FALSE)
+```
+
+```{r}
+X2$GROSPAYXFLAG<-"0"
+X2$GROSPAYXFLAG[is.na(X2$GROSPAYX) == "TRUE"] <- "1"
+X2$GROSPAYXFLAG<-as.factor(X2$GROSPAYXFLAG)
+summary(X2$GROSPAYXFLAG)
+```
+
+```{r}
+rough_X2 <- na.roughfix(X2)
+```
+
+```{r}
+ctrl <- trainControl(method = "cv",
+                     number = 5,
+                     summaryFunction = multiClassSummary,
+                     classProbs = TRUE)
+```
+
+```{r}
+grid <- expand.grid(mtry = c(5))
+```
+
+```{r}
+set.seed(1000)
+rf_rough_X1 <- train(WAGEX_3 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+                       data = rough_X1,
+                       method = "rf",
+                       trControl = ctrl,
+                       tuneGrid = grid,
+                       metric = "ROC",
+                       importance = TRUE,
+                       proximity = TRUE)
+```
+
+```{r}
+set.seed(1000)
+rf_rough_X1b <- train(WAGEX_2 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+                       data = rough_X1,
+                       method = "rf",
+                       trControl = ctrl,
+                       tuneGrid = grid,
+                       metric = "ROC",
+                       importance = TRUE,
+                       proximity = TRUE)
+```
+
+```{r}
+install.packages("MLmetrics")
+library(MLmetrics)
+```
+
+
+```{r}
+set.seed(1000)
+rf_rough_X1c <- train(WAGEX_1 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+                       data = rough_X1,
+                       method = "rf",
+                       trControl = ctrl,
+                       tuneGrid = grid,
+                       metric = "ROC",
+                       importance = TRUE,
+                       proximity = TRUE)
+```
+
+```{r}
+rf_rough_X1
+```
+
+```{r}
+rf_rough_X1b
+```
+
+```{r}
+rf_rough_X1c
+```
+
+
+```{r}
+str(rf_rough_X1$finalModel)
+```
+
+```{r}
+plot(rf_rough_X1$finalModel)
+```
+
+```{r}
+str(rf_rough_X1$finalModel$proximity)
+```
+
+```{r}
+rf_rough_X1$finalModel$proximity[1:10, 1:10]
+```
+
+```{r}
+varImp(rf_rough_X1)
+```
+
+```{r}
+plot(varImp(rf_rough_X1),top=15)
+```
+
+```{r}
+c_rf <- predict(rf_rough_X1,newdata=rough_X2)
+p_rf <- predict(rf_rough_X1,newdata=rough_X2,type="prob")
+```
+
+
+```{r}
+confusionMatrix(c_rf,rough_X2$WAGEX_3)
+```
+
+```{r}
+prob <- verify(pred = p_rf$N, obs=ifelse(rough_X2$WAGEX_3 == "N", 1, 0), frcst.type = "prob", obs.type = "binary")
+```
+
+```{r}
+summary(prob)
+```
+
+```{r}
+rf_roc <- roc(rough_X2$WAGEX_3, p_rf$N)
+rf_roc
+```
+
+```{r}
+plot(rf_roc)
+```
+
+
+##Now for WAGEX_2...
+```{r}
+plot(varImp(rf_rough_X1b),top=15)
+```
+
+```{r}
+c_rfb <- predict(rf_rough_X1b,newdata=rough_X2)
+p_rfb <- predict(rf_rough_X1b,newdata=rough_X2,type="prob")
+```
+
+
+```{r}
+confusionMatrix(c_rfb,rough_X2$WAGEX_2)
+```
+
+```{r}
+probb <- verify(pred = p_rfb$N, obs=ifelse(rough_X2$WAGEX_2 == "N", 1, 0), frcst.type = "prob", obs.type = "binary")
+```
+
+```{r}
+summary(probb)
+```
+
+```{r}
+rf_rocb <- roc(rough_X2$WAGEX_2, p_rf$N)
+rf_rocb
+```
+
+```{r}
+plot(rf_rocb)
+```
+
+
+##Now for WAGEX_1....
+
+```{r}
+plot(varImp(rf_rough_X1c),top=15)
+postResample(pred=rf_rough_X1c,obs=rough_X2$WAGEX_1)
+
+##c_rfc <- predict(rf_rough_X1c,newdata=rough_X2)
+##p_rfc <- predict(rf_rough_X1c,newdata=rough_X2,type="prob")
+##confusionMatrix(c_rfc,rough_X2$WAGEX_1)
+##probc <- verify(pred = p_rfc$D, obs=ifelse(rough_X2$WAGEX_1 == "D", 1, 0), frcst.type = "prob", obs.type = "binary")
+##summary(probc)
+##rf_rocc<-roc(rough_X2$WAGEX_1, p_rfc$D)
+##rf_rocc
+```
+
+
+
+##AdaBoost
+
+```{r}
+evalStats <- function(...) c(twoClassSummary(...),
+                             defaultSummary(...),
+                             mnLogLoss(...))
+```
+
+```{r}
+ctrl2 <- trainControl(method="cv",
+                     number=5,
+                     summaryFunction=evalStats,
+                     classProbs=TRUE)
+```
+
+```{r}
+grid2 <- expand.grid(nIter=c(50,100,150),
+                    method="Adaboost.M1")
+```
+
+```{r}
+set.seed(1000)
+Ada <- train(WAGEX_3 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+  data = rough_X1,  
+  method = "adaboost",
+  trControl=ctrl2,
+  tuneGrid=grid2,
+  metric="logLoss")
+```
+
+```{r}
+Ada
+```
+
+##GBM
+
+```{r}
+grid3<-expand.grid(interaction.depth=1:3,
+                   n.trees=c(500,750,1000),
+                   shrinkage=c(0.05,0.01),
+                   n.minobsinnode=10)
+```
+
+```{r}
+grid3
+```
+
+```{r}
+set.seed(1000)
+Gbm <- train(WAGEX_3 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+             data=rough_X1,
+             method="gbm",
+             trControl=ctrl2,
+             tuneGrid=grid3,
+             metric="logLoss",
+             distribution="bernoulli",
+             verbose=FALSE)
+```
+
+```{r}
+plot(Gbm)
+```
+
+```{r}
+plot(varImp(Gbm),top=20)
+```
+
+##Following the pattern Chris established:  Compare with another CART (results should differ from above)
+```{r}
+grid4<-expand.grid(maxdepth=1:30)
+```
+
+```{r}
+set.seed(1000)
+Cart <- train(WAGEX_3 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+             data=rough_X1,
+             method="rpart2",
+             trControl=ctrl2,
+             tuneGrid=grid4,
+             metric="logLoss")
+```
+
+```{r}
+plot(Cart)
+```
+
+```{r}
+Cart
+```
+
+```{r}
+set.seed(1000)
+Logit<-train(WAGEX_3 ~ ARM_FORC + CU_CODE1 + CUTENURE + 
+                       EARNCOMP + EDUCA + EMPLTYPE +
+                       GROSPAYXFLAG + HORIGIN + IN_COLL + MARITAL +  
+                       MEMBRACE + OCCULIST + TYPOWND +
+                       VEHQ + WAGEB + WKSTATUS + AGE + GROSPAYX + 
+                       HRSPERWK + OCCUEARN,
+             data=rough_X1,
+             method="glm",
+             trControl=ctrl2)
+```
+
+```{r}
+summary(Logit)
+```
+
+```{r}
+C_Ada <- predict(Ada, newdata=rough_X2)
+C_Gbm <- predict(Gbm, newdata=rough_X2)
+C_Cart <- predict(Cart, newdata=rough_X2)
+C_Logit <- predict(Logit, newdata=rough_X2)
+
+P_Ada <- predict(Ada, newdata=rough_X2, type="prob")
+P_Gbm <- predict(Gbm, newdata=rough_X2, type="prob")
+P_Cart <- predict(Cart, newdata=rough_X2, type="prob")
+P_Logit <- predict(Logit, newdata=rough_X2, type="prob")
+
+```
+
+```{r}
+postResample(pred=C_Ada,obs=rough_X2$WAGEX_3)
+```
+
+```{r}
+postResample(pred=C_Gbm,obs=rough_X2$WAGEX_3)
+```
+
+```{r}
+postResample(pred=C_Cart,obs=rough_X2$WAGEX_3)
+```
+
+```{r}
+postResample(pred=C_Logit,obs=rough_X2$WAGEX_3)
+```
+
+```{r}
+Ada_ROC <- roc(rough_X2$WAGEX_3, P_Ada$Y)
+Gbm_ROC <- roc(rough_X2$WAGEX_3, P_Gbm$Y)
+Cart_ROC <- roc(rough_X2$WAGEX_3, P_Cart$Y)
+Logit_ROC <- roc(rough_X2$WAGEX_3, P_Logit$Y)
+```
+
+```{r}
+Ada_ROC
+```
+
+
+
+```{r}
+par(pty="s")
+plot(Ada_ROC,col="blue")
+plot(Gbm_ROC,col="green", add=TRUE)
+plot(Cart_ROC,col="red", add=TRUE)
+plot(Logit_ROC,col="black", add=TRUE)
+```
+
+```{r}
+Ada_ROC2 <- roc(rough_X2$WAGEX_3, P_Ada$N)
+Gbm_ROC2 <- roc(rough_X2$WAGEX_3, P_Gbm$N)
+Cart_ROC2 <- roc(rough_X2$WAGEX_3, P_Cart$N)
+Logit_ROC2 <- roc(rough_X2$WAGEX_3, P_Logit$N)
+```
+
+```{r}
+par(pty="s")
+plot(Ada_ROC2,col="blue")
+plot(Gbm_ROC2,col="green", add=TRUE)
+plot(Cart_ROC2,col="red", add=TRUE)
+plot(Logit_ROC2,col="black", add=TRUE)
+```
+
+```{r}
+confusionMatrix(C_Ada,rough_X2$WAGEX_3)
+```
+
+```{r}
+confusionMatrix(C_Gbm,rough_X2$WAGEX_3)
+```
+
+```{r}
+confusionMatrix(C_Cart,rough_X2$WAGEX_3)
+```
+
+```{r}
+prob <- verify(pred = P_Ada$N, obs=ifelse(rough_X2$WAGEX_3 == "N", 1, 0), frcst.type = "prob", obs.type = "binary")
+```
+
+```{r}
+summary(prob)
+```
+
+
+
+
+
+
+
+
